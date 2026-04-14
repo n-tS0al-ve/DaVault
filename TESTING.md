@@ -24,7 +24,23 @@ Install the required dependencies:
 npm install
 ```
 
-## 3. Environment Configuration
+## 3. Local Database Setup (Docker)
+
+The easiest way to set up a local PostgreSQL database for development is using Docker. If you have Docker installed, follow these steps:
+
+1. Open a new terminal window.
+2. Run the following command to start a PostgreSQL container:
+
+```bash
+docker run --name davault-postgres -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 -d postgres
+```
+
+This will create and start a database running in the background. Your connection string for the `.env` file will now be:
+`postgresql://postgres:mysecretpassword@localhost:5432/postgres`
+
+*(If you prefer to use a cloud database for development, you can create a free one on [Supabase](https://supabase.com/) or [Neon](https://neon.tech/) and use their provided connection string instead).*
+
+## 4. Environment Configuration
 
 You must set up environment variables for the application to function. 
 
@@ -35,8 +51,8 @@ You must set up environment variables for the application to function.
 # -----------------------------------------------------------------------------
 # DATABASE
 # -----------------------------------------------------------------------------
-# Example for a local database: postgresql://postgres:password@localhost:5432/davault_db
-DATABASE_URL="your_postgresql_connection_string"
+# If you used the Docker setup above, use this string:
+DATABASE_URL="postgresql://postgres:mysecretpassword@localhost:5432/postgres"
 
 # -----------------------------------------------------------------------------
 # AUTHENTICATION (NextAuth)
@@ -71,7 +87,7 @@ NEXT_PUBLIC_APP_URL="http://localhost:3000"
 *   **Use Test Keys:** While developing locally, ensure you are using Stripe **Test Mode** API keys (they start with `sk_test_`). Do not use production keys for local development.
 *   **Personal Access Tokens:** If you generate GitHub Personal Access Tokens (PATs) to interact with the repository, set expiration dates and delete them immediately if they are accidentally shared.
 
-## 4. Initialize the Database
+## 5. Initialize the Database
 
 Once your `.env` file is set up and your PostgreSQL database is running, you need to push the Prisma schema to the database. This will create the necessary tables (Users, Servers, Sessions).
 
@@ -81,7 +97,7 @@ Run the following command:
 npx prisma db push
 ```
 
-## 5. Start the Application
+## 6. Start the Application
 
 Start the Next.js development server:
 
@@ -91,7 +107,7 @@ npm run dev
 
 Open your web browser and navigate to: [http://localhost:3000](http://localhost:3000)
 
-## 6. Testing Workflows
+## 7. Testing Workflows
 
 Here are a few things you can test once the app is running:
 
