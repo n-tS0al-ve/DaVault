@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PlusIcon } from "@heroicons/react/20/solid";
+import { PlusIcon, TrashIcon } from "@heroicons/react/20/solid";
 import { GameServer } from "@prisma/client";
 
 export default function ServerList({ initialServers }: { initialServers: GameServer[] }) {
@@ -10,6 +10,29 @@ export default function ServerList({ initialServers }: { initialServers: GameSer
   const [newServerName, setNewServerName] = useState("");
   const [newServerImage, setNewServerImage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleDeleteServer = async (serverId: string) => {
+    if (!confirm("Are you sure you want to delete this server? This action cannot be undone.")) return;
+    
+    setDeletingId(serverId);
+    try {
+      const res = await fetch(`/api/servers/${serverId}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        setServers(servers.filter(s => s.id !== serverId));
+      } else {
+        alert("Failed to delete server");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Error deleting server");
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   const handleCreateServer = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,6 +98,15 @@ export default function ServerList({ initialServers }: { initialServers: GameSer
                     </span>
                   </div>
                   <p className="mt-1 truncate text-sm text-gray-400">{server.image}</p>
+                </div>
+                <div className="flex-shrink-0">
+                  <button
+                    onClick={() => handleDeleteServer(server.id)}
+                    disabled={deletingId === server.id}
+                    className="inline-flex items-center rounded-md bg-red-600/10 px-2.5 py-1.5 text-sm font-semibold text-red-500 shadow-sm hover:bg-red-600/20"
+                  >
+                    {deletingId === server.id ? "Deleting..." : <TrashIcon className="h-5 w-5" aria-hidden="true" />}
+                  </button>
                 </div>
               </div>
             </li>
