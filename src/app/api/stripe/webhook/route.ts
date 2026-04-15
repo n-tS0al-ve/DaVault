@@ -4,7 +4,15 @@ import Stripe from 'stripe';
 import { prisma } from '@/lib/prisma';
 
 export async function POST(req: Request) {
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_123', {
+  const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!stripeSecretKey || !webhookSecret) {
+    console.error('Missing Stripe environment variables');
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+
+  const stripe = new Stripe(stripeSecretKey, {
     apiVersion: '2026-03-25.dahlia',
   });
 
@@ -17,7 +25,7 @@ export async function POST(req: Request) {
     event = stripe.webhooks.constructEvent(
       body,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET || 'whsec_123'
+      webhookSecret
     );
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
