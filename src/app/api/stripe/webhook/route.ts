@@ -2,11 +2,12 @@ import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { prisma } from '@/lib/prisma';
+import { stripe } from '@/lib/stripe';
 
 export async function POST(req: Request) {
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_123', {
-    apiVersion: '2026-03-25.dahlia',
-  });
+  if (!process.env.STRIPE_WEBHOOK_SECRET) {
+    return NextResponse.json({ error: 'Missing STRIPE_WEBHOOK_SECRET environment variable' }, { status: 500 });
+  }
 
   const body = await req.text();
   const signature = (await headers()).get('Stripe-Signature') as string;
@@ -17,7 +18,7 @@ export async function POST(req: Request) {
     event = stripe.webhooks.constructEvent(
       body,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET || 'whsec_123'
+      process.env.STRIPE_WEBHOOK_SECRET
     );
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {

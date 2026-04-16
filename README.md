@@ -1,5 +1,16 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Configuration
+
+### Stripe Setup
+
+This application strictly requires the following Stripe environment variables to function correctly. Hardcoded fallbacks are **not** used in order to enforce security and ensure proper configuration.
+
+- `STRIPE_SECRET_KEY`: Your Stripe secret key (e.g., `sk_test_...` or `sk_live_...`).
+- `STRIPE_WEBHOOK_SECRET`: Your Stripe webhook signing secret (e.g., `whsec_...`).
+
+If these variables are missing, the application will intentionally throw errors or return 500 status codes on affected routes. Ensure you have these configured in your `.env` or deployment environment.
+
 ## Getting Started
 
 First, run the development server:
