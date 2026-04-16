@@ -21,11 +21,7 @@ export const authOptions = {
     session: async ({ session, user }: any) => {
       if (session?.user) {
         session.user.id = user.id;
-        // Optionally fetch more data from db if needed
-        const dbUser = await prisma.user.findUnique({
-          where: { id: user.id }
-        });
-        session.user.subscriptionTier = dbUser?.subscriptionTier || "FREE";
+        session.user.subscriptionTier = user.subscriptionTier || "FREE";
       }
       return session;
     },
