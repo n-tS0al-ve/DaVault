@@ -5,7 +5,13 @@ import Stripe from 'stripe';
 
 export async function POST(req: Request) {
   try {
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_123', {
+    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    if (!stripeSecretKey) {
+      console.error('Missing STRIPE_SECRET_KEY environment variable');
+      return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    }
+
+    const stripe = new Stripe(stripeSecretKey, {
       apiVersion: '2026-03-25.dahlia',
     });
 
